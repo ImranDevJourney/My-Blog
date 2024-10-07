@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if post %}{{ post.title }}{% else %}Create New Post{% endif %}{% endblock %}
+
+{% block content %}
+{% if post %}
+    <h1>{{ post.title }}</h1>
+    <div class="post-content">
+        {{ post.content|safe }} <!-- Use |safe to render HTML -->
+    </div>
+    <p class="text-muted">Posted on {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }} by {{ post.author.username }}</p>
+
+    <hr>
+
+    <h3>Comments</h3>
+    {% if comments %}
+        <ul class="list-group mb-4">
+            {% for comment in comments %}
+                <li class="list-group-item">
+                    <p><strong>{{ comment.user.username }}</strong> commented on {{ comment.date_commented.strftime('%Y-%m-%d %H:%M') }}:</p>
+                    <p>{{ comment.content }}</p>
+                    <p>
+                        <span>{{ comment.likes }} </span>
+                        <span>{{ comment.dislikes }} </span>
+                        <form method="POST" action="{{ url_for('main.like_comment', comment_id=comment.id) }}" style="display:inline;">
+                            <button type="button" class="btn btn-link" onclick="gsap.to(this, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });">Like</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.dislike_comment', comment_id=comment.id) }}" style="display:inline;">
+                            <button type="button" class="btn btn-link" onclick="gsap.to(this, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });">Dislike</button>
+                        </form>
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments yet. Be the first to comment!</p>
+    {% endif %}
+
+    <h3>Add a Comment</h3>
+    <form method="POST" action="{{ url_for('main.post', post_id=post.id) }}">
+        {{ comment_form.hidden_tag() }}
+        <div class="form-group">
+            {{ comment_form.content.label(class='form-label') }}
+            {{ comment_form.content(class='form-control', rows=3, placeholder='Enter your comment here') }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+
+{% else %}
+    <h1>Create New Post</h1>
+    <form method="POST" action="{{ url_for('main.new_post') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.title.label(class='form-label') }}
+            {{ form.title(class='form-control', placeholder='Enter post title') }}
+        </div>
+        <div class="form-group">
+            {{ form.content.label(class='form-label') }}
+            {{ form.content(class='form-control', rows=10, placeholder='Enter post content') }} <!-- Ensure this matches -->
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Post</button>
+    </form>
+
+    <script>
+        // Initialize CKEditor
+        CKEDITOR.replace('content'); // Ensure 'content' matches your field name
+    </script>
+{% endif %}
+<a href="{{ url_for('main.home') }}" class="btn btn-primary mt-3">Back to Home</a>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block content %}
+<h1>Blog Posts</h1>
+
+{% for post in posts %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">{{ post.title }}</h2>
+            <p class="card-text">{{ post.content[:150] }}...</p> <!-- Display first 150 characters -->
+            <a href="{{ url_for('main.post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+        </div>
+        <div class="card-footer text-muted">
+            Posted on {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }} by {{ post.author.username }}
+        </div>
+    </div>
+{% else %}
+    <p>No blog posts available.</p>
+{% endfor %}
+
+<a href="{{ url_for('main.new_post') }}" class="btn btn-success">Create New Post</a>
+
+{% endblock %}
